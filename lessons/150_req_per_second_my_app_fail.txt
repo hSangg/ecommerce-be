@@ -1,0 +1,21 @@
+Root cause: It's not my app failing to process requests, it's a TCP accept-queue overflow at startup burst,
+not runtime performance issue.
+
+server:
+  tomcat:
+    accept-count: 100
+
+accept-count is the OS-level listen backlog. When 150 client sockets try to connect at the same time, the OS
+will only hold 100 connections (Window TCP stack) and the rest will be dropped.
+
+What we can do?
+1. Increase the accept-count in configuration.
+
+Why big platform can handle 1 million requests per second?
+My case: 1 process, 1 listen socket, backlog = 100, 150 simultaneous.
+
+Their case:
+- They use load balancers to distribute the load across multiple processes and servers.
+- OS-level tuning.
+
+
