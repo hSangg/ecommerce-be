@@ -1,0 +1,36 @@
+Root cause: Windows Docker Desktop host-port-forwarding proxy (WSL2/Hyper-V NAT layer)
+has its own connection backlog, completely separate from any config inside the containers
+(Tomcat accept-count, Nginx worker_connections/backlog, Hikari pool, etc).
+
+Symptom:
+- k6 hitting http://localhost:9080/... (host-mapped port) at 250 VUs: 100% pass.
+- Same test at 1000 VUs: 78.8% fail, http_req_duration=0s, data_received≈64B avg per response
+  (i.e. most failures never received a single byte back — instant refusal, not slow processing).
+
+How we proved it wasn't the app/nginx/db:
+Ran k6 from INSIDE the same docker network, bypassing the Windows host port-forward entirely:
+
+    docker run --rm --network ecomerce_default -v "${PWD}\k6:/scripts" grafana/k6 run /scripts/index-internal.js
+
+Script pointed at http://nginx/ecommerce-api/api/v1/products/1 (container DNS name) instead of
+http://localhost:9080/...
+
+Result at 1000 VUs, run from inside the network:
+    checks_succeeded: 100.00% (1000/1000)
+    http_req_failed:  0.00%
+    avg latency ~250ms, max ~572ms (fully reasonable for 1000 concurrent through 3 replicas + MySQL)
+
+Conclusion:
+- App (3 replicas), Nginx (resolver + keepalive fix), Tomcat (accept-count: 500), Hikari pool
+  all handle 1000 concurrent requests correctly.
+- The 78.8% failure was 100% caused by Docker Desktop's Windows<->WSL2 NAT/port-forward layer,
+  which has its own small connection backlog that you CANNOT tune via nginx.conf or application.yml
+  because it isn't part of any container — it's Docker Desktop's host-side infrastructure.
+- This layer does not exist in real production deployments (native Linux hosts, k8s, etc),
+  where traffic goes straight into the container network stack.
+
+Lesson: when load-testing locally on Windows with Docker Desktop, always cross-check high-VU
+results by running the load generator INSIDE the same docker network. If results differ
+drastically (as here), the Windows NAT layer -- not your app -- is the bottleneck, and the
+numbers from localhost:<port> should not be used for real capacity planning.
+
