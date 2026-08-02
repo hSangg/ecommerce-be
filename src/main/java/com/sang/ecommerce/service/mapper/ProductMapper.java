@@ -5,7 +5,6 @@ import com.sang.ecommerce.entity.Product;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface ProductMapper {
-    ProductDTO toDto(Product product);
+public interface ProductMapper extends BaseEntity<ProductDTO, Product> {
 }
 

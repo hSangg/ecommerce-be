@@ -1,20 +1,24 @@
 package com.sang.ecommerce.controller;
 
-import com.sang.ecommerce.utils.JwtUtils;
+import com.sang.ecommerce.dto.LoginRequestDTO;
+import com.sang.ecommerce.dto.LoginResponseDTO;
+import com.sang.ecommerce.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final JwtUtils jwtUtils;
+    private final AuthService authService;
 
     @PostMapping("/login")
-    public String login(@RequestParam("email") String email) {
-        return jwtUtils.generateToken(email);
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequest) {
+        var result = authService.login(loginRequest);
+        return ResponseEntity.ok(result);
     }
 }

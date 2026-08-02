@@ -37,3 +37,7 @@ server:
     accept-count: 500
     max-connections: 8192
     connection-timeout: 20000
+
+jwt:
+  secret: ${JWT_SECRET:ZmFrZUV4YW1wbGVTZWNyZXRLZXlGb3JIUzI1NkFsZ29yaXRobVRlc3Q=}
+  expiration: ${JWT_EXPIRATION:3600000}

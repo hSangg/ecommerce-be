@@ -3,6 +3,7 @@ package com.sang.ecommerce.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -15,14 +16,19 @@ import java.util.function.Function;
 @Component
 public class JwtUtils {
 
-    private static final String SECRET_KEY = "390awef232dssdakrg";
+    private static Key signingKey;
+
+    public JwtUtils(@Value("${jwt.secret}") String secret) {
+        byte[] keyBytes = Base64.getDecoder().decode(secret);
+        signingKey = Keys.hmacShaKeyFor(keyBytes);
+    }
 
     public String generateToken(String email) {
         return Jwts.builder()
                 .subject(email)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 86400000))
-                .signWith(getSigningKey())
+                .signWith(signingKey)
                 .compact();
     }
 
@@ -45,7 +51,7 @@ public class JwtUtils {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith((SecretKey) getSigningKey())
+                .verifyWith((SecretKey) signingKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -54,10 +60,5 @@ public class JwtUtils {
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
-    }
-
-    private Key getSigningKey() {
-        byte[] keyBytes = Base64.getDecoder().decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
     }
 }

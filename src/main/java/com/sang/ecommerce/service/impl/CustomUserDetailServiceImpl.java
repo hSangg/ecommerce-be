@@ -1,5 +1,6 @@
 package com.sang.ecommerce.service.impl;
 
+import com.sang.ecommerce.entity.Role;
 import com.sang.ecommerce.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserDetailServiceImpl implements UserDetailsService {
+public class CustomUserDetailServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
@@ -21,8 +22,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
         return User.withUsername(user.getEmail())
                 .password(null)
-                .roles("USER")
+                .roles(user.getRoles().stream().map(Role::getRoleName).toArray(String[]::new))
                 .build();
-
     }
 }
