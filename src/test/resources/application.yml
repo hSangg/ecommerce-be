@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:ecomerce_test;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:ecomerce_test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -18,3 +18,8 @@ spring:
 server:
   servlet:
     context-path: /ecommerce-api
+
+jwt:
+  secret: ZmFrZUV4YW1wbGVTZWNyZXRLZXlGb3JIUzI1NkFsZ29yaXRobVRlc3Q=
+  expiration: 900000
+  refresh-expiration: 604800000

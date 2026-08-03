@@ -1,9 +1,14 @@
 package com.sang.ecommerce.service;
 
-import com.sang.ecommerce.dto.LoginRequestDTO;
-import com.sang.ecommerce.dto.LoginResponseDTO;
+import com.sang.ecommerce.dto.LoginDTO;
+import com.sang.ecommerce.dto.RefreshTokenDTO;
+import com.sang.ecommerce.dto.RegisterDTO;
 
 public interface AuthService {
-    LoginResponseDTO login(LoginRequestDTO loginRequest);
+    LoginDTO login(LoginDTO loginRequest);
+
+    RefreshTokenDTO refreshToken(RefreshTokenDTO refreshTokenRequest);
+
+    RegisterDTO register(RegisterDTO dto);
 }
 

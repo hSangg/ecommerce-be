@@ -2,10 +2,10 @@ spring:
   application:
     name: ecomerce
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/ecomerce_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/ecomerce_db}
     username: ${DB_USERNAME:ecomerce_user}
     password: ${DB_PASSWORD:ecomerce_pass}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.postgresql.Driver
     hikari:
       pool-name: EcommerceHikariPool
       minimum-idle: 5
@@ -40,4 +40,5 @@ server:
 
 jwt:
   secret: ${JWT_SECRET:ZmFrZUV4YW1wbGVTZWNyZXRLZXlGb3JIUzI1NkFsZ29yaXRobVRlc3Q=}
-  expiration: ${JWT_EXPIRATION:3600000}
+  expiration: ${JWT_EXPIRATION:900000} #15 minutes
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000} # 7 days

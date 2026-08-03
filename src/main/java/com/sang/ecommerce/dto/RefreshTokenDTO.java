@@ -8,12 +8,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserDTO {
-    private Long id;
-    private String username;
-    private String email;
-
+public class RefreshTokenDTO {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String password;
+    private String refreshToken;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String accessToken;
 }
 
