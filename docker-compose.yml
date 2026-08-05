@@ -17,6 +17,25 @@ services:
       timeout: 5s
       retries: 10
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.1.2
+    container_name: ecomerce-elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false
+      - xpack.monitoring.collection.enabled=true
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   adminer:
     image: adminer:latest
     container_name: ecomerce-adminer
@@ -36,10 +55,13 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-ecomerce_db}
       DB_USERNAME: ${DB_USERNAME:-ecomerce_user}
       DB_PASSWORD: ${DB_PASSWORD:-ecomerce_pass}
+      ELASTICSEARCH_URL: http://elasticsearch:9200
     expose:
       - "8080"
     depends_on:
       postgres:
+        condition: service_healthy
+      elasticsearch:
         condition: service_healthy
 
   nginx:
@@ -55,4 +77,5 @@ services:
 
 volumes:
   postgres_data:
+  es_data:
 

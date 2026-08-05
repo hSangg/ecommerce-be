@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
@@ -16,6 +18,11 @@ public class ProductController {
     @GetMapping("/{id}")
     public ProductDTO getProduct(@PathVariable Long id) {
         return productService.getProductById(id);
+    }
+
+    @GetMapping("/search")
+    public List<ProductDTO> search(@RequestParam String keyword) {
+        return productService.searchProduct(keyword);
     }
 
     @PostMapping

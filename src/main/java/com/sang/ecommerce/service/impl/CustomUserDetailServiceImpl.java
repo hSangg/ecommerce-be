@@ -3,6 +3,7 @@ package com.sang.ecommerce.service.impl;
 import com.sang.ecommerce.entity.Role;
 import com.sang.ecommerce.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,9 +21,11 @@ public class CustomUserDetailServiceImpl implements UserDetailsService {
         var user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
 
+        var authorities = user.getRoles().stream().map(Role::getRoleName).map(SimpleGrantedAuthority::new).toList();
+
         return User.withUsername(user.getEmail())
                 .password(null)
-                .roles(user.getRoles().stream().map(Role::getRoleName).toArray(String[]::new))
+                .authorities(authorities)
                 .build();
     }
 }
